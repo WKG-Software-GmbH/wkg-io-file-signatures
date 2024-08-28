@@ -1,5 +1,6 @@
 stages:
   - build
+  - test
   - increase-version
   - deploy-baget
 
@@ -20,6 +21,11 @@ include:
 
 build:
   extends: .build
+
+test:
+  extends: .test
+  variables:
+    TEST_PROJECT_FILE_PATH: "Wkg.IO.FileSignatures/Wkg.IO.FileSignatures.Tests/Wkg.IO.FileSignatures.Tests.csproj"
 
 increase-version:
   extends: .increase-version
