@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <!--.NET build settings-->
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <!--Nuget packaging-->
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <RepositoryUrl>https://git.wkg.lan/WKG/components/wkg-io-file-signatures</RepositoryUrl>
+        <PackageProjectUrl>https://git.wkg.lan/WKG/components/wkg-io-file-signatures</PackageProjectUrl>
+        <Title>WKG I/O File Signatures</Title>
+        <Description>An internal library for file fingerprinting and signature detection based on known file header formats. This library is used for file upload validation in ASP.NET Core applications.</Description>
+        <Company>WKG Software GmbH</Company>
+        <Authors>WKG Software GmbH</Authors>
+        <Copyright>Copyright (c) WKG Software GmbH 2024</Copyright>
+        <PackageIcon>logo.png</PackageIcon>
+        <PackageType>Dependency</PackageType>
+        <PackageTags>
+            file-signatures;file-headers;file-fingerprinting;file-signature-detection;file-upload-validation;aspnet-core;magic-bytes
+        </PackageTags>
+    </PropertyGroup>
+
+    <!--Nuget symbols and debugging-->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <EmbedAllSources>true</EmbedAllSources>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenMcdf" Version="2.3.1" />
+        <PackageReference Include="Wkg" Version="[8.2.16943,8.3)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="_assets\logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+</Project>

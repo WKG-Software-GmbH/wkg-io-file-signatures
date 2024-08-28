@@ -1,0 +1,34 @@
+stages:
+  - build
+  - increase-version
+  - deploy-baget
+
+variables:
+  PROJECT_PATH: "Wkg.IO.FileSignatures/Wkg.IO.FileSignatures"
+  PROJECT_FILE_PATH: "${PROJECT_PATH}/Wkg.IO.FileSignatures.csproj"
+  DOTNET_CI_VERSION_FILE: "${PROJECT_PATH}/WkgIOFileSignatures.cs"
+  MAJOR_VERSION: "8"
+  MINOR_VERSION: "0"
+
+include:
+  - project: 'wkg/gitlab-templates'
+    ref: 'v1.2.13'
+    file:
+      - '/jobs/build_dotnet_8.yml'
+      - '/jobs/increase_version.yml'
+      - '/jobs/deploy_baget_dotnet_8.yml'
+
+build:
+  extends: .build
+
+increase-version:
+  extends: .increase-version
+  only:
+    - main
+    - master
+    - /^rc-.*$/
+    - /^dev-.*$/ 
+    - /^diag-.*$/ 
+
+deploy:
+  extends: .deploy-baget
