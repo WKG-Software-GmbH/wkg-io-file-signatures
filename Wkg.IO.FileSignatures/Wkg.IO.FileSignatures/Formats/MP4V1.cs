@@ -5,5 +5,5 @@ namespace Wkg.IO.FileSignatures.Formats;
 /// </summary>
 public class MP4V1 : Isobmff
 {
-    public MP4V1() : base(new byte[] { 0x69, 0x73, 0x6F, 0x6D }, "video/mp4", "mp4") => Pass();
+    public MP4V1() : base("isom"u8, "video/mp4", "mp4") => Pass();
 }

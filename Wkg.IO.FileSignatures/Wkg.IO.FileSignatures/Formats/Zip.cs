@@ -5,7 +5,7 @@
 /// </summary>
 public class Zip : FileFormat
 {
-    public Zip() : this(4, "application/zip", "zip") => Pass();
+    public Zip() : this(headerLength: 4, "application/zip", "zip") => Pass();
 
-    protected Zip(int headerLength, string mediaType, string extension) : base(new byte[] { 0x50, 0x4B, 0x03, 0x04 }, headerLength, mediaType, extension) => Pass();
+    protected Zip(int headerLength, string mediaType, string extension) : base([0x50, 0x4B, 0x03, 0x04], headerLength, mediaType, extension) => Pass();
 }

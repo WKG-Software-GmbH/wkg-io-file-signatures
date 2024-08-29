@@ -5,5 +5,5 @@ namespace Wkg.IO.FileSignatures.Formats;
 /// </summary>
 public class ThreeGPP : Isobmff
 {
-    public ThreeGPP() : base(new byte[] { 0x33, 0x67, 0x70 }, "video/3gpp", "3gp") => Pass();
+    public ThreeGPP() : base("3gp"u8, "video/3gpp", "3gp") => Pass();
 }

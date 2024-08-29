@@ -18,7 +18,7 @@ public abstract class CompoundFileBinary : FileFormat, IFileFormatReader
     /// <param name="mediaType">The media type of the format.</param>
     /// <param name="extension">The appropriate extension for the format.</param>
     public CompoundFileBinary(string storage, string mediaType, string extension) : base(
-        new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 },
+        [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1],
         int.MaxValue,
         mediaType,
         extension)

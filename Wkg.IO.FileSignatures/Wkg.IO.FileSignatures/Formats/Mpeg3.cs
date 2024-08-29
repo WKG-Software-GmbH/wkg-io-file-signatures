@@ -5,5 +5,5 @@
 /// </summary>
 public class Mpeg3 : FileFormat
 {
-    public Mpeg3() : base(new byte[] { 0x49, 0x44, 0x33 }, "audio/mpeg", "mp3") { }
+    public Mpeg3() : base("ID3"u8, "audio/mpeg", "mp3") { }
 }

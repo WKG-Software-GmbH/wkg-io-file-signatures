@@ -9,10 +9,10 @@ public class OfficeOpenXmlTests
     [TestMethod]
     public void InvalidZipArchiveDoesNotThrow()
     {
-        var inspector = new FileFormatInspector();
+        FileFormatInspector inspector = new();
 
-        using var stream = new MemoryStream(new byte[] { 0x50, 0x4B, 0x03, 0x04 });
-        var format = inspector.DetermineFileFormat(stream);
+        using MemoryStream stream = new([0x50, 0x4B, 0x03, 0x04]);
+        FileFormat? format = inspector.DetermineFileFormat(stream);
 
         Assert.IsNotNull(format);
         Assert.IsInstanceOfType<Zip>(format);
@@ -21,17 +21,17 @@ public class OfficeOpenXmlTests
     [TestMethod]
     public void IdentifierWithoutExtensionDoesNotThrow()
     {
-        var format = new TestOfficeOpenXml("test", "example/test", "test");
+        TestOfficeOpenXml format = new("test", "example/test", "test");
 
-        using var stream = new MemoryStream();
-        using (var createArchive = new ZipArchive(stream, ZipArchiveMode.Create, true))
+        using MemoryStream stream = new();
+        using (ZipArchive createArchive = new(stream, ZipArchiveMode.Create, true))
         {
             createArchive.CreateEntry("test");
         }
 
-        using var archive = new ZipArchive(stream, ZipArchiveMode.Read);
+        using ZipArchive archive = new(stream, ZipArchiveMode.Read);
 
-        var result = format.IsMatch(archive);
+        bool result = format.IsMatch(archive);
 
         Assert.IsTrue(result);
     }

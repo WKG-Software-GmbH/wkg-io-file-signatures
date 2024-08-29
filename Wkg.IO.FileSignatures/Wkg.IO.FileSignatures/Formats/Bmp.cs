@@ -5,5 +5,5 @@
 /// </summary>
 public class Bmp : Image
 {
-    public Bmp() : base(new byte[] { 0x42, 0x4D }, "image/bmp", "bmp") => Pass();
+    public Bmp() : base("BM"u8, "image/bmp", "bmp") => Pass();
 }

@@ -38,7 +38,7 @@ public static class FileFormatLocator
     /// <param name="includeDefaults">Whether to include the default format definitions with the results from the external assembly.</param>
     public static IEnumerable<FileFormat> GetFormats(Assembly assembly, bool includeDefaults)
     {
-        var formatsInAssembly = GetFormats(assembly);
+        IEnumerable<FileFormat> formatsInAssembly = GetFormats(assembly);
 
         if (!includeDefaults)
         {
@@ -46,7 +46,7 @@ public static class FileFormatLocator
         }
         else
         {
-            var formatsThisAssembly = GetFormats();
+            IEnumerable<FileFormat> formatsThisAssembly = GetFormats();
             return formatsInAssembly.Union(formatsThisAssembly);
         }
     }

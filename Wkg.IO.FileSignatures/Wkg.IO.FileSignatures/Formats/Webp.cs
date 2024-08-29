@@ -5,7 +5,7 @@ namespace Wkg.IO.FileSignatures.Formats;
 /// </summary>
 public class Webp : Image
 {
-    private static readonly byte[] WEBP = { 0x57, 0x45, 0x42, 0x50 };
+    private static ReadOnlySpan<byte> FileSignature => [0x57, 0x45, 0x42, 0x50];
 
-    public Webp() : base(WEBP, "image/webp", "webp", 8) => Pass();
+    public Webp() : base(FileSignature, "image/webp", "webp", 8) => Pass();
 }

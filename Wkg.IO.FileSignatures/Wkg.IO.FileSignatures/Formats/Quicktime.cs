@@ -5,5 +5,5 @@ namespace Wkg.IO.FileSignatures.Formats;
 /// </summary>
 public class Quicktime : Isobmff
 {
-    public Quicktime() : base(new byte[] { 0x71, 0x74, 0x20, 0x20 }, "video/quicktime", "mov") { }
+    public Quicktime() : base("qt  "u8, "video/quicktime", "mov") { }
 }

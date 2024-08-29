@@ -1,4 +1,6 @@
-﻿namespace Wkg.IO.FileSignatures.Tests;
+﻿using System.ComponentModel;
+
+namespace Wkg.IO.FileSignatures.Tests;
 
 [TestClass]
 public class FileFormatInspectorTests
@@ -6,18 +8,18 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void StreamCannotBeNull()
     {
-        var inspector = new FileFormatInspector();
+        FileFormatInspector inspector = new();
 
-        Assert.ThrowsException<ArgumentNullException>(() => inspector.DetermineFileFormat(null));
+        Assert.ThrowsException<ArgumentNullException>(() => inspector.DetermineFileFormat(null!));
     }
 
     [TestMethod]
     public void EmptyStreamReturnsNull()
     {
-        var inspector = new FileFormatInspector();
+        FileFormatInspector inspector = new();
         FileFormat? result;
 
-        using (var stream = new MemoryStream())
+        using (MemoryStream stream = new())
         {
             result = inspector.DetermineFileFormat(stream);
         }
@@ -28,8 +30,8 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void StreamMustBeSeekable()
     {
-        var nonSeekableStream = new NonSeekableStream();
-        var inspector = new FileFormatInspector(Array.Empty<FileFormat>());
+        NonSeekableStream nonSeekableStream = new();
+        FileFormatInspector inspector = new([]);
 
         Assert.ThrowsException<NotSupportedException>(() => inspector.DetermineFileFormat(nonSeekableStream));
     }
@@ -47,30 +49,15 @@ public class FileFormatInspectorTests
 
         public override long Position { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
-        public override void Flush()
-        {
-            throw new NotImplementedException();
-        }
+        public override void Flush() => throw new NotImplementedException();
 
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
 
-        public override void SetLength(long value)
-        {
-            throw new NotImplementedException();
-        }
+        public override void SetLength(long value) => throw new NotImplementedException();
 
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
         #endregion
     }
@@ -78,10 +65,10 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void UnrecognisedReturnsNull()
     {
-        var inspector = new FileFormatInspector(Array.Empty<FileFormat>());
-        FileFormat result;
+        FileFormatInspector inspector = new([]);
+        FileFormat? result;
 
-        using (var stream = new MemoryStream(new byte[] { 0x0A }))
+        using (MemoryStream stream = new([0x0A]))
         {
             result = inspector.DetermineFileFormat(stream);
         }
@@ -92,11 +79,11 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void SingleMatchIsReturned()
     {
-        var expected = new TestFileFormat(new byte[] { 0x42, 0x4D });
-        var inspector = new FileFormatInspector(new FileFormat[] { expected });
-        FileFormat result;
+        TestFileFormat expected = new("BM"u8);
+        FileFormatInspector inspector = new([expected]);
+        FileFormat? result;
 
-        using (var stream = new MemoryStream(new byte[] { 0x42, 0x4D, 0x3A, 0x00 }))
+        using (MemoryStream stream = new([0x42, 0x4D, 0x3A, 0x00]))
         {
             result = inspector.DetermineFileFormat(stream);
         }
@@ -107,12 +94,12 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void StreamIsReadUntilRequiredBufferIsReceived()
     {
-        var expected = new TestFileFormat(new byte[] { 0x00, 0x01 });
-        var incorrect = new TestFileFormat(new byte[] { 0x00, 0x02 });
-        var inspector = new FileFormatInspector(new FileFormat[] { expected, incorrect });
-        FileFormat result;
+        TestFileFormat expected = new([0x00, 0x01]);
+        TestFileFormat incorrect = new([0x00, 0x02]);
+        FileFormatInspector inspector = new([expected, incorrect]);
+        FileFormat? result;
 
-        using (var fragmentedStream = new FragmentedStream(new byte[] { 0x00, 0x01, 0x03 }))
+        using (FragmentedStream fragmentedStream = new([0x00, 0x01, 0x03]))
         {
             result = inspector.DetermineFileFormat(fragmentedStream);
         }
@@ -123,12 +110,12 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void StreamIsResetToOriginalPosition()
     {
-        var shortSignature = new TestFileFormat(new byte[] { 0x00, 0x01 });
-        var longSignaure = new TestFileFormat(new byte[] { 0x00, 0x01, 0x02 });
-        var inspector = new FileFormatInspector(new FileFormat[] { shortSignature, longSignaure });
-        var position = 0L;
+        TestFileFormat shortSignature = new([0x00, 0x01]);
+        TestFileFormat longSignaure = new([0x00, 0x01, 0x02]);
+        FileFormatInspector inspector = new([shortSignature, longSignaure]);
+        long position = 0L;
 
-        using (var stream = new MemoryStream(new byte[] { 0x00, 0x01, 0x02, 0x03, 0x04 }))
+        using (MemoryStream stream = new([0x00, 0x01, 0x02, 0x03, 0x04]))
         {
             inspector.DetermineFileFormat(stream);
             position = stream.Position;
@@ -140,12 +127,12 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void MultipleMatchesReturnsMostDerivedFormat()
     {
-        var baseFormat = new BaseFormat();
-        var inheritedFormat = new InheritedFormat();
-        var inspector = new FileFormatInspector(new FileFormat[] { inheritedFormat, baseFormat });
-        FileFormat result = null;
+        BaseFormat baseFormat = new();
+        InheritedFormat inheritedFormat = new();
+        FileFormatInspector inspector = new([inheritedFormat, baseFormat]);
+        FileFormat? result;
 
-        using (var stream = new MemoryStream(new byte[] { 0x00 }))
+        using (MemoryStream stream = new([0x00]))
         {
             result = inspector.DetermineFileFormat(stream);
         }
@@ -156,13 +143,13 @@ public class FileFormatInspectorTests
     [TestMethod]
     public void MutipleMatchesReturnsFormatWithLongestHeader()
     {
-        var shortHeader = new TestFileFormat(new byte[] { 0x02, 0x00 });
-        var longHeader = new AnotherTestFileFormat(new byte[] { 0x02, 0x00, 0xFF });
+        TestFileFormat shortHeader = new([0x02, 0x00]);
+        AnotherTestFileFormat longHeader = new([0x02, 0x00, 0xFF]);
 
-        var inspector = new FileFormatInspector(new FileFormat[] { shortHeader, longHeader });
-        FileFormat result = null;
+        FileFormatInspector inspector = new([shortHeader, longHeader]);
+        FileFormat? result;
 
-        using (var stream = new MemoryStream(new byte[] { 0x02, 0x00, 0xFF, 0xFA }))
+        using (MemoryStream stream = new([0x02, 0x00, 0xFF, 0xFA]))
         {
             result = inspector.DetermineFileFormat(stream);
         }
@@ -173,9 +160,7 @@ public class FileFormatInspectorTests
 
     private class FragmentedStream : MemoryStream
     {
-        public FragmentedStream(byte[] buffer) : base(buffer)
-        {
-        }
+        public FragmentedStream(byte[] buffer) : base(buffer) => Pass();
 
         public override int Read(byte[] buffer, int offset, int count)
         {
@@ -183,40 +168,18 @@ public class FileFormatInspectorTests
         }
     }
 
-    private class TestFileFormat : FileFormat
-    {
-        public TestFileFormat(byte[] signature) : base(signature, "example/test", "test")
-        {
-        }
-    }
+    private class TestFileFormat(ReadOnlySpan<byte> signature) : FileFormat(signature, "example/test", "test");
 
     private class BaseFormat : FileFormat
     {
-        public BaseFormat() : this("example/base")
-        {
-        }
+        public BaseFormat() : this("example/base") => Pass();
 
-        protected BaseFormat(string mediaType) : base(new byte[] { 0x00 }, mediaType, "")
-        {
-        }
+        protected BaseFormat(string mediaType) : base([0x00], mediaType, "") => Pass();
 
-        public override bool IsMatch(Stream stream)
-        {
-            return true;
-        }
+        public override bool IsMatch(Stream stream) => true;
     }
 
-    private class InheritedFormat : BaseFormat
-    {
-        public InheritedFormat() : base("example/inherited")
-        {
-        }
-    }
+    private class InheritedFormat() : BaseFormat("example/inherited");
 
-    private class AnotherTestFileFormat : FileFormat
-    {
-        public AnotherTestFileFormat(byte[] signature) : base(signature, "example/another", "test")
-        {
-        }
-    }
+    private class AnotherTestFileFormat(byte[] signature) : FileFormat(signature, "example/another", "test");
 }

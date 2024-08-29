@@ -48,20 +48,20 @@ public class FunctionalTests
     [DataRow("test.ico", "image/vnd.microsoft.icon")]
     public void SamplesAreRecognised(string sample, string expected)
     {
-        var result = InspectSample(sample);
+        FileFormat? result = InspectSample(sample);
 
         Assert.IsNotNull(result);
         Assert.AreEqual(expected, result?.MediaType);
     }
 
-    private static FileFormat InspectSample(string fileName)
+    private static FileFormat? InspectSample(string fileName)
     {
-        var inspector = new FileFormatInspector();
-        var buildDirectoryPath = Path.GetDirectoryName(typeof(FunctionalTests).Assembly.Location);
-        var sample = new FileInfo(Path.Combine(buildDirectoryPath ?? string.Empty, "Samples", fileName));
-        FileFormat result;
+        FileFormatInspector inspector = new();
+        string? buildDirectoryPath = Path.GetDirectoryName(typeof(FunctionalTests).Assembly.Location);
+        FileInfo sample = new(Path.Combine(buildDirectoryPath ?? string.Empty, "Samples", fileName));
+        FileFormat? result;
 
-        using (var stream = sample.OpenRead())
+        using (FileStream stream = sample.OpenRead())
         {
             result = inspector.DetermineFileFormat(stream);
         }

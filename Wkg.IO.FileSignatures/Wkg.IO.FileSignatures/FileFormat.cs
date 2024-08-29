@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Immutable;
 
 namespace Wkg.IO.FileSignatures;
 
@@ -8,65 +8,9 @@ namespace Wkg.IO.FileSignatures;
 public abstract class FileFormat : IEquatable<FileFormat>
 {
     /// <summary>
-    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
-    /// </summary>
-    /// <param name="signature">The header signature of the format.</param>
-    /// <param name="mediaType">The media type of the format.</param>
-    /// <param name="extension">The appropriate file extension for the format.</param>
-    protected FileFormat(byte[] signature, string mediaType, string extension)
-        : this(signature, signature == null ? 0 : signature.Length, mediaType, extension, 0) => Pass();
-
-    /// <summary>
-    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
-    /// </summary>
-    /// <param name="signature">The header signature of the format.</param>
-    /// <param name="mediaType">The media type of the format.</param>
-    /// <param name="extension">The appropriate file extension for the format.</param>
-    /// <param name="offset">The offset at which the signature is located.</param>
-    protected FileFormat(byte[] signature, string mediaType, string extension, int offset)
-        : this(signature, signature == null ? offset : signature.Length + offset, mediaType, extension, offset) => Pass();
-
-    /// <summary>
-    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
-    /// </summary>
-    /// <param name="signature">The header signature of the format.</param>
-    /// <param name="headerLength">The number of bytes required to determine the format.</param>
-    /// <param name="mediaType">The media type of the format.</param>
-    /// <param name="extension">The appropriate file extension for the format.</param>
-    protected FileFormat(byte[] signature, int headerLength, string mediaType, string extension)
-        : this(signature, headerLength, mediaType, extension, 0) => Pass();
-
-    /// <summary>
-    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
-    /// </summary>
-    /// <param name="signature">The header signature of the format.</param>
-    /// <param name="headerLength">The number of bytes required to determine the format.</param>
-    /// <param name="mediaType">The media type of the format.</param>
-    /// <param name="extension">The appropriate file extension for the format.</param>
-    /// <param name="offset">The offset at which the signature is located.</param>
-    protected FileFormat(byte[] signature, int headerLength, string mediaType, string extension, int offset)
-    {
-        if (signature == null)
-        {
-            throw new ArgumentNullException(nameof(signature));
-        }
-
-        if (string.IsNullOrEmpty(mediaType))
-        {
-            throw new ArgumentNullException(nameof(mediaType));
-        }
-
-        Signature = new ReadOnlyCollection<byte>(signature);
-        HeaderLength = headerLength;
-        Offset = offset;
-        Extension = extension;
-        MediaType = mediaType;
-    }
-
-    /// <summary>
     /// Gets a byte signature which can be used to identify the file format.
     /// </summary>
-    public ReadOnlyCollection<byte> Signature { get; }
+    public ImmutableArray<byte> Signature { get; }
 
     /// <summary>
     /// Gets the number of bytes required to determine the format.
@@ -90,6 +34,61 @@ public abstract class FileFormat : IEquatable<FileFormat>
     public int Offset { get; }
 
     /// <summary>
+    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
+    /// </summary>
+    /// <param name="signature">The header signature of the format.</param>
+    /// <param name="headerLength">The number of bytes required to determine the format.</param>
+    /// <param name="mediaType">The media type of the format.</param>
+    /// <param name="extension">The appropriate file extension for the format.</param>
+    /// <param name="offset">The offset at which the signature is located.</param>
+    protected FileFormat(ReadOnlySpan<byte> signature, int headerLength, string mediaType, string extension, int offset)
+    {
+        if (signature.IsEmpty)
+        {
+            throw new ArgumentException("Signature cannot be empty.", nameof(signature));
+        }
+        if (string.IsNullOrEmpty(mediaType))
+        {
+            throw new ArgumentNullException(nameof(mediaType));
+        }
+
+        Signature = [.. signature];
+        HeaderLength = headerLength;
+        Offset = offset;
+        Extension = extension;
+        MediaType = mediaType;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
+    /// </summary>
+    /// <param name="signature">The header signature of the format.</param>
+    /// <param name="mediaType">The media type of the format.</param>
+    /// <param name="extension">The appropriate file extension for the format.</param>
+    protected FileFormat(ReadOnlySpan<byte> signature, string mediaType, string extension)
+        : this(signature, signature.Length, mediaType, extension, 0) => Pass();
+
+    /// <summary>
+    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
+    /// </summary>
+    /// <param name="signature">The header signature of the format.</param>
+    /// <param name="mediaType">The media type of the format.</param>
+    /// <param name="extension">The appropriate file extension for the format.</param>
+    /// <param name="offset">The offset at which the signature is located.</param>
+    protected FileFormat(ReadOnlySpan<byte> signature, string mediaType, string extension, int offset)
+        : this(signature, signature.Length + offset, mediaType, extension, offset) => Pass();
+
+    /// <summary>
+    /// Initializes a new instance of the FileFormat class which has the specified signature and media type.
+    /// </summary>
+    /// <param name="signature">The header signature of the format.</param>
+    /// <param name="headerLength">The number of bytes required to determine the format.</param>
+    /// <param name="mediaType">The media type of the format.</param>
+    /// <param name="extension">The appropriate file extension for the format.</param>
+    protected FileFormat(ReadOnlySpan<byte> signature, int headerLength, string mediaType, string extension)
+        : this(signature, headerLength, mediaType, extension, 0) => Pass();
+
+    /// <summary>
     /// Returns a value indicating whether the format matches a file header.
     /// </summary>
     /// <param name="stream">The stream to check.</param>
@@ -102,9 +101,9 @@ public abstract class FileFormat : IEquatable<FileFormat>
 
         stream.Position = Offset;
 
-        for (int i = 0; i < Signature.Count; i++)
+        for (int i = 0; i < Signature.Length; i++)
         {
-            var b = stream.ReadByte();
+            int b = stream.ReadByte();
             if (b != Signature[i])
             {
                 return false;
@@ -118,10 +117,7 @@ public abstract class FileFormat : IEquatable<FileFormat>
     /// Determines whether the object is equal to this FileFormat.
     /// </summary>
     /// <param name="obj">The object to compare.</param>
-    public override bool Equals(object obj)
-    {
-        return Equals(obj as FileFormat);
-    }
+    public override bool Equals(object? obj) => Equals(obj as FileFormat);
 
     /// <summary>
     /// Determines whether the format is equal to this FileFormat.
@@ -154,15 +150,10 @@ public abstract class FileFormat : IEquatable<FileFormat>
     {
         unchecked
         {
-            if (Signature == null)
+            int hash = 17;
+            foreach (byte element in Signature)
             {
-                return 0;
-            }
-
-            var hash = 17;
-            foreach (var element in Signature)
-            {
-                hash = hash * 31 + element.GetHashCode();
+                hash = (hash * 31) + element.GetHashCode();
             }
 
             return hash;
@@ -172,8 +163,5 @@ public abstract class FileFormat : IEquatable<FileFormat>
     /// <summary>
     /// Returns a string that represents this format.
     /// </summary>
-    public override string ToString()
-    {
-        return MediaType;
-    }
+    public override string ToString() => MediaType;
 }

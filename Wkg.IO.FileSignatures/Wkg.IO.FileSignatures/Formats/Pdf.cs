@@ -5,11 +5,11 @@
 /// </summary>
 public class Pdf : FileFormat
 {
-    private const uint MaxFileHeaderSize = 1024;
+    private const uint MAX_FILE_HEADER_SIZE = 1024;
 
     public Pdf() : this([0x25, 0x50, 0x44, 0x46]) => Pass();
 
-    protected Pdf(byte[] signature) : base(signature, "application/pdf", "pdf", 0) => Pass();
+    protected Pdf(ReadOnlySpan<byte> signature) : base(signature, "application/pdf", "pdf", 0) => Pass();
 
     public override bool IsMatch(Stream stream)
     {
@@ -19,10 +19,10 @@ public class Pdf : FileFormat
         }
 
         stream.Position = 0;
-        var signatureValidationIndex = 0;
+        int signatureValidationIndex = 0;
         int fileByte;
 
-        while (stream.Position < MaxFileHeaderSize && (fileByte = stream.ReadByte()) != -1)
+        while (stream.Position < MAX_FILE_HEADER_SIZE && (fileByte = stream.ReadByte()) != -1)
         {
             if (CompareFileByteToSignatureAt((byte)fileByte, signatureValidationIndex))
             {
@@ -33,8 +33,10 @@ public class Pdf : FileFormat
                 signatureValidationIndex = 0;
             }
 
-            if (signatureValidationIndex == Signature.Count)
+            if (signatureValidationIndex == Signature.Length)
+            {
                 return true;
+            }
         }
 
         return false;
@@ -43,31 +45,5 @@ public class Pdf : FileFormat
     protected virtual bool CompareFileByteToSignatureAt(byte fileByte, int signatureIndex)
     {
         return fileByte == Signature[signatureIndex];
-    }
-}
-
-public class AdobePdf : Pdf
-{
-    private const byte VersionNumberPlaceholder = 0x00;
-
-    public AdobePdf() : base([
-        0x25, 0x21, 0x50, 0x53, 0x2D, 0x41, 0x64, 0x6F, 0x62, 0x65, 0x2D, VersionNumberPlaceholder, 0x2E,
-        VersionNumberPlaceholder, 0x20, 0x50, 0x44,
-        0x46, 0x2D, VersionNumberPlaceholder, 0x2E, VersionNumberPlaceholder
-    ]) => Pass();
-
-    protected override bool CompareFileByteToSignatureAt(byte fileByte, int signatureIndex)
-    {
-        return base.CompareFileByteToSignatureAt(fileByte, signatureIndex) || IsVersionNumber(fileByte, Signature[signatureIndex]);
-    }
-
-    private static bool IsVersionNumber(byte fileByte, byte signatureByte)
-    {
-        return signatureByte == VersionNumberPlaceholder && IsNumber(fileByte);
-    }
-
-    private static bool IsNumber(byte @byte)
-    {
-        return @byte is >= 0x30 and <= 0x39;
     }
 }

@@ -5,5 +5,5 @@
 /// </summary>
 public class Spiff : Jpeg
 {
-    public Spiff() : base(new byte[] { 0xFF, 0xE8 }) => Pass();
+    public Spiff() : base([0xFF, 0xE8]) => Pass();
 }

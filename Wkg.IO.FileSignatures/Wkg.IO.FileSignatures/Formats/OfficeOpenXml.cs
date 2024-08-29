@@ -33,9 +33,9 @@ public abstract class OfficeOpenXml : Zip, IFileFormatReader
         if (file is ZipArchive archive)
         {
             // Match archives which contain a non-standard version of the identifiable entry, e.g. document2.xml instead of document.xml.
-            var index = Math.Max(0, IdentifiableEntry.LastIndexOf('.'));
-            var fileName = IdentifiableEntry.Substring(0, IdentifiableEntry.Length - index);
-            var extension = IdentifiableEntry.Substring(index);
+            int index = Math.Max(0, IdentifiableEntry.LastIndexOf('.'));
+            string fileName = IdentifiableEntry.Substring(0, IdentifiableEntry.Length - index);
+            string extension = IdentifiableEntry.Substring(index);
             return archive.Entries.Any(e => e.FullName.StartsWith(fileName, StringComparison.OrdinalIgnoreCase)
                     && e.FullName.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
         }

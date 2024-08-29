@@ -3,23 +3,18 @@
 /// <summary>
 /// Provides a mechanism to determine the format of a file.
 /// </summary>
-public class FileFormatInspector : IFileFormatInspector
+/// <remarks>
+/// Initialises a new FileFormatInspector instance which can determine the specified file formats.
+/// </remarks>
+/// <param name="formats">The formats which are recognised.</param>
+public class FileFormatInspector(IEnumerable<FileFormat> formats) : IFileFormatInspector
 {
-    private readonly IEnumerable<FileFormat> _formats;
+    private readonly IEnumerable<FileFormat> _formats = formats ?? throw new ArgumentNullException(nameof(formats));
 
     /// <summary>
     /// Initialises a new FileFormatInspector instance which can determine the default file formats.
     /// </summary>
     public FileFormatInspector() : this(FileFormatLocator.GetFormats()) => Pass();
-
-    /// <summary>
-    /// Initialises a new FileFormatInspector instance which can determine the specified file formats.
-    /// </summary>
-    /// <param name="formats">The formats which are recognised.</param>
-    public FileFormatInspector(IEnumerable<FileFormat> formats)
-    {
-        _formats = formats ?? throw new ArgumentNullException(nameof(formats));
-    }
 
     /// <summary>
     /// Determines the format of a file.
@@ -28,10 +23,7 @@ public class FileFormatInspector : IFileFormatInspector
     /// <returns>An instance of a matching file format, or null if the format could not be determined.</returns>
     public FileFormat? DetermineFileFormat(Stream stream)
     {
-        if (stream == null)
-        {
-            throw new ArgumentNullException(nameof(stream));
-        }
+        ArgumentNullException.ThrowIfNull(stream);
 
         if (!stream.CanSeek)
         {
@@ -43,7 +35,7 @@ public class FileFormatInspector : IFileFormatInspector
             return null;
         }
 
-        var matches = FindMatchingFormats(stream);
+        List<FileFormat> matches = FindMatchingFormats(stream);
 
         if (matches.Count > 1)
         {
@@ -60,9 +52,7 @@ public class FileFormatInspector : IFileFormatInspector
 
     private List<FileFormat> FindMatchingFormats(Stream stream)
     {
-        var candidates = _formats
-            .OrderBy(t => t.HeaderLength)
-            .ToList();
+        List<FileFormat> candidates = [.. _formats.OrderBy(t => t.HeaderLength)];
 
         for (int i = 0; i < candidates.Count; i++)
         {
@@ -75,12 +65,12 @@ public class FileFormatInspector : IFileFormatInspector
 
         if (candidates.Count > 1)
         {
-            var readers = candidates.OfType<IFileFormatReader>().ToList();
+            List<IFileFormatReader> readers = candidates.OfType<IFileFormatReader>().ToList();
 
-            if (readers.Any())
+            if (readers.Count != 0)
             {
-                using var file = readers[0].Read(stream);
-                foreach (var reader in readers)
+                using IDisposable? file = readers[0].Read(stream);
+                foreach (IFileFormatReader? reader in readers)
                 {
                     if (!reader.IsMatch(file))
                     {
@@ -96,9 +86,9 @@ public class FileFormatInspector : IFileFormatInspector
 
     private static void RemoveBaseFormats(List<FileFormat> candidates)
     {
-        for (var i = 0; i < candidates.Count; i++)
+        for (int i = 0; i < candidates.Count; i++)
         {
-            for (var j = 0; j < candidates.Count; j++)
+            for (int j = 0; j < candidates.Count; j++)
             {
                 if (i != j && candidates[j].GetType().IsAssignableFrom(candidates[i].GetType()))
                 {

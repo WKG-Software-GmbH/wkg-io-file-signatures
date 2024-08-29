@@ -5,5 +5,5 @@
 /// </summary>
 public class Gif : Image
 {
-    public Gif() : base(new byte[] { 0x47, 0x49, 0x46, 0x38 }, "image/gif", "gif") => Pass();
+    public Gif() : base("GIF8"u8, "image/gif", "gif") => Pass();
 }

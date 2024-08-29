@@ -5,26 +5,26 @@ namespace Wkg.IO.FileSignatures.Tests.Formats;
 [TestClass]
 public class PdfTests
 {
-    private static readonly byte[] PdfHeader = "%PDF"u8.ToArray();
-    private const int MaxFileHeaderSize = 1024;
+    private const int MAX_FILE_HEADER_SIZE = 1024;
+
+    private static ReadOnlySpan<byte> PdfHeader => "%PDF"u8;
 
     public static IEnumerable<object[]> MatchHeaderAtAnyPlaceInFileHeaderData =>
-        new List<object[]>
-        {
-            new object[] { Enumerable.Range(0, 42).Select(i => (byte)i).ToArray() },
-            new object[] { Array.Empty<byte>() },
-            new object[] { Enumerable.Range(0, MaxFileHeaderSize - PdfHeader.Length).Select(i => (byte)i).ToArray() },
-        };
+    [
+        [Enumerable.Range(0, 42).Select(i => (byte)i).ToArray()],
+        [Array.Empty<byte>()],
+        [Enumerable.Range(0, MAX_FILE_HEADER_SIZE - PdfHeader.Length).Select(i => (byte)i).ToArray()],
+    ];
 
     [DataTestMethod]
     [DynamicData(nameof(MatchHeaderAtAnyPlaceInFileHeaderData))]
     public void MatchPdfHeaderAtAnyPlaceInFileHeader(byte[] data)
     {
-        var format = new Pdf();
-        byte[] fileHeader = data.Concat(PdfHeader).ToArray();
+        Pdf format = new();
+        byte[] fileHeader = [..data, ..PdfHeader];
 
-        using var ms = new MemoryStream(fileHeader);
-        var result = format.IsMatch(ms);
+        using MemoryStream ms = new(fileHeader);
+        bool result = format.IsMatch(ms);
 
         Assert.IsTrue(result);
     }
@@ -32,14 +32,17 @@ public class PdfTests
     [TestMethod]
     public void MatchAdobePdfHeaderInFileHeader()
     {
-        var format = new AdobePdf();
-        byte[] fileHeader = Enumerable
-            .Range(0, 42)
-            .Select(i => (byte)i)
-            .Concat("%!PS-Adobe-1.3 PDF-1.5"u8.ToArray()).ToArray();
+        AdobePdf format = new();
+        byte[] fileHeader =
+        [
+            ..Enumerable
+                .Range(0, 42)
+                .Select(i => (byte)i),
+            .."%!PS-Adobe-1.3 PDF-1.5"u8
+        ];
 
-        using var ms = new MemoryStream(fileHeader);
-        var result = format.IsMatch(ms);
+        using MemoryStream ms = new(fileHeader);
+        bool result = format.IsMatch(ms);
 
         Assert.IsTrue(result);
     }
@@ -47,14 +50,17 @@ public class PdfTests
     [TestMethod]
     public void DoesNotMatchPdfHeaderOutsideFileHeader()
     {
-        var format = new Pdf();
-        byte[] fileHeader = Enumerable
-            .Range(0, MaxFileHeaderSize)
-            .Select(i => (byte)i)
-            .Concat(PdfHeader).ToArray();
+        Pdf format = new();
+        byte[] fileHeader =
+        [
+            .. Enumerable
+                .Range(0, MAX_FILE_HEADER_SIZE)
+                .Select(i => (byte)i),
+            .. PdfHeader
+        ];
 
-        using var ms = new MemoryStream(fileHeader);
-        var result = format.IsMatch(ms);
+        using MemoryStream ms = new(fileHeader);
+        bool result = format.IsMatch(ms);
 
         Assert.IsFalse(result);
     }
@@ -62,11 +68,11 @@ public class PdfTests
     [TestMethod]
     public void DoesNotMatchContentSmallerThanHeader()
     {
-        var format = new Pdf();
+        Pdf format = new();
         byte[] header = [0x25, 0x50, 0x44];
 
-        using var ms = new MemoryStream(header);
-        var result = format.IsMatch(ms);
+        using MemoryStream ms = new(header);
+        bool result = format.IsMatch(ms);
 
         Assert.IsFalse(result);
     }
@@ -76,10 +82,10 @@ public class PdfTests
     [DataRow(new byte[] { 0x25, 0x50, 0x44, 0x64 })]
     public void DoesNotMatchDifferentHeader(byte[] header)
     {
-        var format = new Pdf();
+        Pdf format = new();
 
-        using var ms = new MemoryStream(header);
-        var result = format.IsMatch(ms);
+        using MemoryStream ms = new(header);
+        bool result = format.IsMatch(ms);
 
         Assert.IsFalse(result);
     }
