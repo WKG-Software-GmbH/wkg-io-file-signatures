@@ -46,6 +46,8 @@ public class FunctionalTests
     [DataRow("test.ogg", "audio/ogg")]
     [DataRow("test.amr", "audio/amr")]
     [DataRow("test.ico", "image/vnd.microsoft.icon")]
+    [DataRow("test.webm", "video/webm")]
+    [DataRow("test.mkv", "video/x-matroska")]
     public void SamplesAreRecognised(string sample, string expected)
     {
         FileFormat? result = InspectSample(sample);

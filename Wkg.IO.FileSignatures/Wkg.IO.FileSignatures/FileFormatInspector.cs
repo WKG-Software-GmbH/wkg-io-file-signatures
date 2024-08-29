@@ -1,4 +1,7 @@
-﻿namespace Wkg.IO.FileSignatures;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
+
+namespace Wkg.IO.FileSignatures;
 
 /// <summary>
 /// Provides a mechanism to determine the format of a file.
@@ -9,7 +12,7 @@
 /// <param name="formats">The formats which are recognised.</param>
 public class FileFormatInspector(IEnumerable<FileFormat> formats) : IFileFormatInspector
 {
-    private readonly IEnumerable<FileFormat> _formats = formats ?? throw new ArgumentNullException(nameof(formats));
+    private readonly ImmutableArray<FileFormat> _formats = [.. formats.OrderBy(t => t.HeaderLength)];
 
     /// <summary>
     /// Initialises a new FileFormatInspector instance which can determine the default file formats.
@@ -35,65 +38,77 @@ public class FileFormatInspector(IEnumerable<FileFormat> formats) : IFileFormatI
             return null;
         }
 
-        List<FileFormat> matches = FindMatchingFormats(stream);
+        Span<bool> candidates = stackalloc bool[_formats.Length];
+        int matches = FindMatchingFormats(stream, candidates);
 
-        if (matches.Count > 1)
+        if (matches > 1)
         {
-            RemoveBaseFormats(matches);
+            RemoveBaseFormats(candidates, ref matches);
         }
 
-        if (matches.Count > 0)
+        if (matches > 0)
         {
-            return matches.OrderByDescending(m => m.HeaderLength).First();
+            for (int i = candidates.Length - 1; i >= 0; i--)
+            {
+                if (candidates[i])
+                {
+                    return _formats[i];
+                }
+            }
         }
 
         return null;
     }
 
-    private List<FileFormat> FindMatchingFormats(Stream stream)
+    private int FindMatchingFormats(Stream stream, Span<bool> candidates)
     {
-        List<FileFormat> candidates = [.. _formats.OrderBy(t => t.HeaderLength)];
-
-        for (int i = 0; i < candidates.Count; i++)
+        Debug.Assert(candidates.Length == _formats.Length);
+        int matches = 0;
+        for (int i = 0; i < _formats.Length; i++)
         {
-            if (!candidates[i].IsMatch(stream))
+            if (_formats[i].IsMatch(stream))
             {
-                candidates.RemoveAt(i);
-                i--;
+                candidates[i] = true;
+                matches++;
             }
         }
 
-        if (candidates.Count > 1)
+        if (matches > 1)
         {
-            List<IFileFormatReader> readers = candidates.OfType<IFileFormatReader>().ToList();
-
-            if (readers.Count != 0)
+            for (int i = 0; i < _formats.Length; i++)
             {
-                using IDisposable? file = readers[0].Read(stream);
-                foreach (IFileFormatReader? reader in readers)
+                if (candidates[i] && _formats[i] is IFileFormatReader reader)
                 {
-                    if (!reader.IsMatch(file))
+                    using IDisposable? file = reader.Read(stream);
+                    if (file is null || !reader.IsMatch(file))
                     {
-                        candidates.Remove((FileFormat)reader);
+                        candidates[i] = false;
+                        matches--;
                     }
                 }
             }
         }
 
         stream.Position = 0;
-        return candidates;
+        return matches;
     }
 
-    private static void RemoveBaseFormats(List<FileFormat> candidates)
+    private void RemoveBaseFormats(Span<bool> candidates, ref int matches)
     {
-        for (int i = 0; i < candidates.Count; i++)
+        Debug.Assert(candidates.Length > 1);
+        Debug.Assert(candidates.Length == _formats.Length);
+        for (int i = 0; i < candidates.Length; i++)
         {
-            for (int j = 0; j < candidates.Count; j++)
+            if (!candidates[i])
             {
-                if (i != j && candidates[j].GetType().IsAssignableFrom(candidates[i].GetType()))
+                continue;
+            }
+            for (int j = 0; j < candidates.Length; j++)
+            {
+                if (i != j && candidates[j] && _formats[j].GetType().IsAssignableFrom(_formats[i].GetType()))
                 {
-                    candidates.RemoveAt(j);
-                    i--; j--;
+                    candidates[j] = false;
+                    matches--;
                 }
             }
         }
