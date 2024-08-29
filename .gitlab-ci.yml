@@ -7,7 +7,6 @@ stages:
 variables:
   PROJECT_PATH: "Wkg.IO.FileSignatures/Wkg.IO.FileSignatures"
   PROJECT_FILE_PATH: "${PROJECT_PATH}/Wkg.IO.FileSignatures.csproj"
-  DOTNET_CI_VERSION_FILE: "${PROJECT_PATH}/WkgIOFileSignatures.cs"
   MAJOR_VERSION: "8"
   MINOR_VERSION: "0"
 
@@ -39,3 +38,5 @@ increase-version:
 
 deploy:
   extends: .deploy-baget
+  variables:
+    DOTNET_CI_VERSION_FILE: "${PROJECT_PATH}/WkgIOFileSignatures.cs"
