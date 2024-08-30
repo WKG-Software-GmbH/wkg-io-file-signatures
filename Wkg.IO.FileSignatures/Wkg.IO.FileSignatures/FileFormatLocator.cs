@@ -9,7 +9,7 @@ public static class FileFormatLocator
     /// </summary>
     public static IEnumerable<FileFormat> GetFormats()
     {
-        return GetFormats(typeof(FileFormatLocator).GetTypeInfo().Assembly);
+        return GetFormats(typeof(FileFormatLocator).Assembly);
     }
 
     /// <summary>
@@ -18,16 +18,13 @@ public static class FileFormatLocator
     /// <param name="assembly">The assembly which contains the file format definitions.</param>
     public static IEnumerable<FileFormat> GetFormats(Assembly assembly)
     {
-        if (assembly == null)
-        {
-            throw new ArgumentNullException(nameof(assembly));
-        }
+        ArgumentNullException.ThrowIfNull(assembly);
 
         return assembly.GetTypes()
              .Where(t => typeof(FileFormat).IsAssignableFrom(t))
              .Where(t => !t.GetTypeInfo().IsAbstract)
              .Where(t => t.GetConstructors().Any(c => c.GetParameters().Length == 0))
-             .Select(t => Activator.CreateInstance(t))
+             .Select(Activator.CreateInstance)
              .OfType<FileFormat>();
     }
 
@@ -49,5 +46,14 @@ public static class FileFormatLocator
             IEnumerable<FileFormat> formatsThisAssembly = GetFormats();
             return formatsInAssembly.Union(formatsThisAssembly);
         }
+    }
+
+    public static IEnumerable<TFileFormat> SubTypesOf<TFileFormat>(Assembly? assembly = null) where TFileFormat : FileFormat
+    {
+        assembly ??= typeof(FileFormatLocator).Assembly;
+        return assembly.GetTypes()
+             .Where(t => t.IsAssignableTo(typeof(TFileFormat)) && !t.IsAbstract && t.GetConstructors().Any(c => c.GetParameters().Length is 0))
+             .Select(Activator.CreateInstance)
+             .Cast<TFileFormat>();
     }
 }
