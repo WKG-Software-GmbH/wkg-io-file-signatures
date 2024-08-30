@@ -4,6 +4,7 @@ namespace Wkg.IO.FileSignatures.Tests;
 public class FunctionalTests
 {
     [DataTestMethod]
+    [DataRow("test.3gp", "video/3gpp")]
     [DataRow("test.bmp", "image/bmp")]
     [DataRow("test.doc", "application/msword")]
     [DataRow("test.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")]
@@ -51,9 +52,11 @@ public class FunctionalTests
     public void SamplesAreRecognised(string sample, string expected)
     {
         FileFormat? result = InspectSample(sample);
-
         Assert.IsNotNull(result);
         Assert.AreEqual(expected, result?.MediaType);
+        bool hasRegistryEntry = FileFormatRegistry.MimeTypeRegistry.TryGetValue(expected, out FileFormatGroup group);
+        Assert.IsTrue(hasRegistryEntry);
+        Assert.IsTrue(group.Formats.Any(f => f.GetType() == result?.GetType()));
     }
 
     private static FileFormat? InspectSample(string fileName)

@@ -1,9 +1,7 @@
-namespace Wkg.IO.FileSignatures.Formats;
+﻿namespace Wkg.IO.FileSignatures.Formats;
 
 /// <summary>
-/// Specifies the format of a MPEG-4 video
+/// Specifies the format of a MPEG-4 file
 /// </summary>
-public class MP4 : Isobmff
-{
-    public MP4() : base("mp42"u8, "video/mp4", "mp4") => Pass();
-}
+/// <param name="signature">The concrete signature of the format.</param>
+public abstract class MP4(ReadOnlySpan<byte> signature) : Isobmff(signature, "video/mp4", "mp4");
