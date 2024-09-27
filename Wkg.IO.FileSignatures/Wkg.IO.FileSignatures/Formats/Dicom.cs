@@ -3,7 +3,4 @@
 /// <summary>
 /// Specifies the format of a Dicom file.
 /// </summary>
-public class Dicom : FileFormat
-{
-    public Dicom() : base("DICM"u8, "application/dicom", "dcm", 128) => Pass();
-}
+public class Dicom() : FileFormat("DICM"u8, "application/dicom", "dcm", offset: 128);

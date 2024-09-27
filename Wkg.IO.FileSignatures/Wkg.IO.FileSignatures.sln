@@ -9,10 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
-		nuget.config = nuget.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wkg.IO.FileSignatures.Tests", "Wkg.IO.FileSignatures.Tests\Wkg.IO.FileSignatures.Tests.csproj", "{2992E0D0-FEF4-4BCF-A851-30845CBF2A43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wkg.IO.FileSignatures.Tests", "Wkg.IO.FileSignatures.Tests\Wkg.IO.FileSignatures.Tests.csproj", "{2992E0D0-FEF4-4BCF-A851-30845CBF2A43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,10 +27,6 @@ Global
 		{2992E0D0-FEF4-4BCF-A851-30845CBF2A43}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2992E0D0-FEF4-4BCF-A851-30845CBF2A43}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2992E0D0-FEF4-4BCF-A851-30845CBF2A43}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1D349F6-831B-4A8A-A7BA-35ED59B5DFE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D349F6-831B-4A8A-A7BA-35ED59B5DFE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1D349F6-831B-4A8A-A7BA-35ED59B5DFE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1D349F6-831B-4A8A-A7BA-35ED59B5DFE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

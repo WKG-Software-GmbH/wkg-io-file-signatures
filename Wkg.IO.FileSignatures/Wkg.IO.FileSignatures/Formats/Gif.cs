@@ -3,7 +3,4 @@
 /// <summary>
 /// Specifies the format of Graphics Interchange Format (GIF) image.
 /// </summary>
-public class Gif : Image
-{
-    public Gif() : base("GIF8"u8, "image/gif", "gif") => Pass();
-}
+public class Gif() : Image("GIF8"u8, "image/gif", "gif");

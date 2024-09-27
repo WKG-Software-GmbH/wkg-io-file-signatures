@@ -36,6 +36,7 @@ public abstract class CompoundFileBinary : FileFormat, IFileFormatReader
     /// </summary>
     public string Storage { get; }
 
+    /// <inheritdoc/>
     public bool IsMatch(IDisposable? file)
     {
         if (file is CompoundFile cf)
@@ -48,6 +49,7 @@ public abstract class CompoundFileBinary : FileFormat, IFileFormatReader
         }
     }
 
+    /// <inheritdoc/>
     public IDisposable? Read(Stream stream)
     {
         try

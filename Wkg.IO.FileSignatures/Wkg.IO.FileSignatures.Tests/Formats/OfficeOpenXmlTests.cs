@@ -36,10 +36,6 @@ public class OfficeOpenXmlTests
         Assert.IsTrue(result);
     }
 
-    private class TestOfficeOpenXml : OfficeOpenXml
-    {
-        public TestOfficeOpenXml(string identifiableEntry, string mediaType, string extension) : base(identifiableEntry, mediaType, extension)
-        {
-        }
-    }
+    private class TestOfficeOpenXml(string identifiableEntry, string mediaType, string extension) 
+        : OfficeOpenXml(identifiableEntry, mediaType, extension);
 }

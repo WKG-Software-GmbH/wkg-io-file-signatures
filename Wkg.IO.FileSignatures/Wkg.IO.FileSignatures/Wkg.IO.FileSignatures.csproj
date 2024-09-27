@@ -6,19 +6,25 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+		<!-- CI injected versioning -->
+		<VersionPrefix>0.0.0</VersionPrefix>
+		<VersionSuffix>CI-INJECTED</VersionSuffix>
     </PropertyGroup>
 
     <!--Nuget packaging-->
     <PropertyGroup>
-        <IsPackable>true</IsPackable>
-        <RepositoryUrl>https://git.wkg.lan/WKG/components/wkg-io-file-signatures</RepositoryUrl>
-        <PackageProjectUrl>https://git.wkg.lan/WKG/components/wkg-io-file-signatures</PackageProjectUrl>
+		<PackageId>Wkg.IO.FileSignatures</PackageId>
         <Title>WKG I/O File Signatures</Title>
-        <Description>An internal library for file fingerprinting and signature detection based on known file header formats. This library is used for file upload validation in ASP.NET Core applications.</Description>
+        <IsPackable>true</IsPackable>
+        <RepositoryUrl>https://github.com/WKG-Software-GmbH/wkg-io-file-signatures</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/WKG-Software-GmbH/wkg-io-file-signatures</PackageProjectUrl>
+        <Description>Wkg.IO.FileSignatures implements file fingerprinting and signature detection based on known file header formats. Commonly used for file upload validation in ASP.NET Core applications.</Description>
         <Company>WKG Software GmbH</Company>
         <Authors>WKG Software GmbH</Authors>
         <Copyright>Copyright (c) WKG Software GmbH 2024</Copyright>
         <PackageIcon>logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageType>Dependency</PackageType>
         <PackageTags>
             file-signatures;file-headers;file-fingerprinting;file-signature-detection;file-upload-validation;aspnet-core;magic-bytes
@@ -34,12 +40,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenMcdf" Version="2.3.1" />
-        <PackageReference Include="Wkg" Version="[8.2.16943,8.3)" />
+        <PackageReference Include="OpenMcdf" Version="[2.3.1,2.4.0)" />
+        <PackageReference Include="Wkg" Version="[8.2.17550,8.3.0)" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="_assets\logo.png" Pack="true" PackagePath="\" />
+        <None Include="_Assets\logo.png" Pack="true" PackagePath="\" />
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>

@@ -11,6 +11,7 @@ public class Pdf : FileFormat
 
     protected Pdf(ReadOnlySpan<byte> signature) : base(signature, "application/pdf", "pdf", 0) => Pass();
 
+    /// <inheritdoc/>
     public override bool IsMatch(Stream stream)
     {
         if (stream == null || stream.Length < HeaderLength)

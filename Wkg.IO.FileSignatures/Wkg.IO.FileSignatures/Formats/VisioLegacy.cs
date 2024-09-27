@@ -1,6 +1,3 @@
 ﻿namespace Wkg.IO.FileSignatures.Formats;
 
-public class VisioLegacy : CompoundFileBinary
-{
-    public VisioLegacy() : base("VisioDocument", "application/vnd.visio", "vsd") => Pass();
-}
+public class VisioLegacy() : CompoundFileBinary("VisioDocument", "application/vnd.visio", "vsd");

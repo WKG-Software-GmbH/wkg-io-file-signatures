@@ -3,7 +3,4 @@
 /// <summary>
 /// Specifies the format of a legacy Powerpoint 97-2003 presentation.
 /// </summary>
-public class PowerPointLegacy : CompoundFileBinary
-{
-    public PowerPointLegacy() : base("PowerPoint Document", "application/vnd.ms-powerpoint", "ppt") => Pass();
-}
+public class PowerPointLegacy() : CompoundFileBinary("PowerPoint Document", "application/vnd.ms-powerpoint", "ppt");

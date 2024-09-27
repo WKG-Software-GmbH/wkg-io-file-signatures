@@ -4,7 +4,4 @@
 /// Specifies the format of an icon file.
 /// See <see href="https://www.iana.org/assignments/media-types/image/vnd.microsoft.icon"/>
 /// </summary>
-public class Icon : Image
-{
-    public Icon() : base([0x00, 0x00, 0x01, 0x00], "image/vnd.microsoft.icon", "ico") => Pass();
-}
+public class Icon() : Image([0x00, 0x00, 0x01, 0x00], "image/vnd.microsoft.icon", "ico");
