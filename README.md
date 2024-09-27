@@ -6,7 +6,7 @@
 
 `Wkg.IO.FileSignatures` is an updated version of [Neil Harvey's FileSignatures library](https://github.com/neilharvey/FileSignatures) for file fingerprinting and signature detection based on known file header formats. A core goal of this library is to provide a simple and easy-to-use API for detecting file types based on their headers, as commonly required in file upload and processing scenarios.
 
-As part of our commitment to open-source software, we are making this updated version of the library [available to the public](https://github.com/WKG-Software-GmbH/wkg-aspnet-core/) under the GNU General Public License v3.0. We hope that it will be useful to other developers and that the community will contribute to its further development.
+As part of our commitment to open-source software, we are making this updated version of the library [available to the public](https://github.com/WKG-Software-GmbH/wkg-io-file-signatures/) under the GNU General Public License v3.0. We hope that it will be useful to other developers and that the community will contribute to its further development.
 
 ## Disclaimer
 
