@@ -90,13 +90,19 @@ You can now inject `IVideoFileValidationService` into your controllers or servic
 public class UploadController(IVideoFileValidationService fileValidationService) : ControllerBase
 {
     [HttpPost]
-    public IActionResult UploadFile(IFormFile file)
+    public async Task<IActionResult> UploadFileAsync(IFormFile file)
     {
-        if (!fileValidationService.IsValid(file.OpenReadStream()))
+        await using Stream fileStream = file.OpenReadStream();
+        // CachingStream from WKG Base library, otherwise use MemoryStream to buffer the stream into memory
+        await using CachingStream bufferStream = new CachingStream(fileStream, leaveOpen: true);
+        if (!fileValidationService.IsValid(bufferStream))
         {
             return BadRequest("Invalid file format");
         }
-        // process the file
+        // and if everything is fine write the buffer to disk
+        await using Stream destination = File.OpenWrite("output");
+        buffer.Seek(0, SeekOrigin.Begin);
+        await buffer.CopyToAsync(destination);
         return Ok();
     }
 }
