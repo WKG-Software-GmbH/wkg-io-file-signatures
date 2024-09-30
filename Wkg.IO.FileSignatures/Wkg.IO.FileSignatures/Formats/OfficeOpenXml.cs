@@ -28,16 +28,25 @@ public abstract class OfficeOpenXml : Zip, IFileFormatReader
     /// </summary>
     public string IdentifiableEntry { get; }
 
+    /// <inheritdoc/>
     public bool IsMatch(IDisposable? file)
     {
         if (file is ZipArchive archive)
         {
             // Match archives which contain a non-standard version of the identifiable entry, e.g. document2.xml instead of document.xml.
             int index = Math.Max(0, IdentifiableEntry.LastIndexOf('.'));
-            string fileName = IdentifiableEntry.Substring(0, IdentifiableEntry.Length - index);
-            string extension = IdentifiableEntry.Substring(index);
-            return archive.Entries.Any(e => e.FullName.StartsWith(fileName, StringComparison.OrdinalIgnoreCase)
-                    && e.FullName.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
+            ReadOnlySpan<char> fileName = IdentifiableEntry.AsSpan()[..^index];
+            ReadOnlySpan<char> extension = IdentifiableEntry.AsSpan()[index..];
+            foreach (ZipArchiveEntry entry in archive.Entries)
+            {
+                ReadOnlySpan<char> entryName = entry.FullName.AsSpan();
+                if (entryName.StartsWith(fileName, StringComparison.OrdinalIgnoreCase) &&
+                    entryName.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
         else
         {

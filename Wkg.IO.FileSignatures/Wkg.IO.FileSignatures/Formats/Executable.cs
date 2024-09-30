@@ -3,7 +3,4 @@
 /// <summary>
 /// Specifies the format of a Windows executable file
 /// </summary>
-public class Executable : FileFormat
-{
-    public Executable() : base("MZ"u8, "application/vnd.microsoft.portable-executable", "exe") => Pass();
-}
+public class Executable() : FileFormat("MZ"u8, "application/vnd.microsoft.portable-executable", "exe");

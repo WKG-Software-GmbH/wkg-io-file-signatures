@@ -3,7 +3,4 @@
 /// <summary>
 /// Specified the format of a Still Picture Interchange File Format (SPIFF) file.
 /// </summary>
-public class Spiff : Jpeg
-{
-    public Spiff() : base([0xFF, 0xE8]) => Pass();
-}
+public class Spiff() : Jpeg([0xFF, 0xE8]);
