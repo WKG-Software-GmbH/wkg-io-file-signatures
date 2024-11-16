@@ -2,8 +2,8 @@
 
     <!--.NET build settings-->
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>13</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 		<!-- CI injected versioning -->
@@ -20,7 +20,7 @@
         <PackageProjectUrl>https://github.com/WKG-Software-GmbH/wkg-io-file-signatures</PackageProjectUrl>
         <Description>Wkg.IO.FileSignatures implements file fingerprinting and signature detection based on known file header formats. Commonly used for file upload validation in ASP.NET Core applications.</Description>
         <Company>WKG Software GmbH</Company>
-        <Authors>WKG Software GmbH</Authors>
+        <Authors>WKG Software GmbH,Frederik Höft</Authors>
         <Copyright>Copyright (c) WKG Software GmbH 2024</Copyright>
         <PackageIcon>logo.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -41,7 +41,7 @@
 
     <ItemGroup>
         <PackageReference Include="OpenMcdf" Version="[2.3.1,2.4.0)" />
-        <PackageReference Include="Wkg" Version="[8.2.17550,8.3.0)" />
+        <PackageReference Include="Wkg" Version="[9.0.17748,9.1)" />
     </ItemGroup>
 
     <ItemGroup>
